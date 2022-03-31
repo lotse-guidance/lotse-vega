@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  backend:
+    build:
+      context: lotse
+      dockerfile: Dockerfile
+    container_name: scented-loste-backend
+    volumes:
+    - ./lotse/app:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+    - 8019:80
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: scented-lotse-frontend
+    ports:
+      - 8018:80

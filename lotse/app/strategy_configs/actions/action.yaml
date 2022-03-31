@@ -1,0 +1,14 @@
+type: action
+
+metadata:
+  description: Captures previous interactions and replays them as scents
+  degree: orienting
+  action_id: scent
+
+generate_suggestion_content:
+  args: [ctx]
+  load: return (ctx.interactions, "", "")
+
+is_applicable:
+  args: [ctx, delta]
+  load: return True

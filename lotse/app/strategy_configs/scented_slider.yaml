@@ -1,0 +1,11 @@
+metadata:
+  strategy: Scented Slider Example
+  description: Collects slider interactions from all users and replays them to every subscribed interface
+  degree: orienting
+
+action:
+  file_path: actions/action.yaml
+
+determine_applicability:
+  args: [ctx]
+  load: return True

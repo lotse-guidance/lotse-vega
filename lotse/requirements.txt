@@ -1,0 +1,4 @@
+fastapi
+fastapi-health
+uvicorn[standard]
+lotse==1.0.0

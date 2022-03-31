@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lotse-Vega Example</title>
+    <meta charset="utf-8" />
+
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.21.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.2"></script>
+
+    <style media="screen">
+        /* Add space between Vega-Embed links  */
+        .vega-actions a {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Scented Slider with Lotse</h1>
+<!-- Container for the visualization -->
+
+<div>This website contains a simple demonstration of how to replicate a scented slider with lotse and vega-lite.</div>
+<div>All slider changes are sent to lotse as analysis state updates, and distributed back to all other instances of this website, providing live-updating scents to all users. </div>
+
+<div id="vis"></div>
+<div>
+    <input type="range" id="slider" name="slider" min="0" max="100" onchange="send(this.value)" style="width:200px"> <label for="slider">Value</label>
+</div>
+
+<script>
+
+    // Assign the specification to a local variable vlSpec.
+    const vlSpec = {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: {
+            name: 'bars',
+            values: [ ]
+        },
+        mark: 'bar',
+        encoding: {
+            y: {
+                aggregate: "count",
+            },
+            x: {
+                bin: {
+                    extent: [0, 100]
+                },
+                field: "val",
+
+            }
+        },
+        height: 60,
+        config: {
+            axisX:  {
+                labels: false,
+                ticks: false,
+                title: null
+            },
+            axisY:  {
+                labels: false,
+                ticks: false,
+                title: null
+            }
+        }
+    };
+
+    vegaEmbed('#vis', vlSpec).then(function (res) {
+        /**
+         * Generates a new tuple with random walk.
+         */
+        const socket = new WebSocket('ws://localhost:8019/guidance/channels/user');
+        socket.addEventListener('message', function (message) {
+            const sugg = JSON.parse(message.data)
+            const changeSet = vega.changeset().remove(() => true).insert(sugg.suggestion.event.value)
+            res.view.change('bars', changeSet).run();
+        });
+
+        res.view.addEventListener('click', function(event, item) {
+            console.log(event, item)
+            // add custom logic, e.g. syncing clicks back to the Lotse state as well.
+        });
+
+    });
+
+    function send(value) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:8019/guidance/state/update_with_callback", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            "callback": "add_interaction",
+            params: {
+                value: {
+                    val: value
+                }
+            }
+        }));
+    }
+</script>
+</body>
+</html>

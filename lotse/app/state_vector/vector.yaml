@@ -1,0 +1,6 @@
+interactions: []
+
+add_interaction:
+  type: function
+  args: [value]
+  load: self.interactions.append(value)

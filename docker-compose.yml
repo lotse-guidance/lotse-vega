@@ -16,7 +16,7 @@ services:
   frontend:
     build:
       context: frontend
-      dockerfile: Dockerfile
+      dockerfile: infrastructure/Dockerfile
     container_name: scented-lotse-frontend
     ports:
       - 8018:80
